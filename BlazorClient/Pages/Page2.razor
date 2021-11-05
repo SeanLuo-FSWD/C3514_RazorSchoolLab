@@ -1,0 +1,27 @@
+﻿@*Expect an age to match with Age class(capital A) *@
+@page "/page2/{age}" 
+@inject NavigationManager NavManager
+
+    <h2>Second Page</h2>
+    <p>You are @Age years old.</p>
+    <p>In 5 years, you will be @agePlusFive years old</p>
+
+    <p><button @onclick="@returnToPage1">Return to Page 1</button></p>
+
+    @code {
+        [Parameter]
+        public string Age { get; set; }
+
+        int agePlusFive;
+
+        protected override void OnInitialized()
+        {
+            agePlusFive = int.Parse(Age) + 5;
+        }
+
+        private void returnToPage1()
+        {
+            @*NavManager is used to go back*@
+            NavManager.NavigateTo("/");
+        }
+    }

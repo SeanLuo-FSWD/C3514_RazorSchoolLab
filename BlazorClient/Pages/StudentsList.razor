@@ -1,0 +1,75 @@
+@page "/studentslist"
+@inject HttpClient httpClient
+@inject NavigationManager NavManager
+
+<h1>Students</h1>
+
+<p>This component demonstrates fetching data from the server.</p>
+
+@if (students == null)
+{
+<p><em>Loading...</em></p> }
+else
+{
+        <a class="btn btn-danger btn-sm" @onclick="@(() => ShowAddPage())">add student</a>
+        <table class='table table-hover'>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>School</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in students)
+            {
+            <tr>
+                <td>@item.StudentId</td>
+                <td>@item.FirstName</td>
+                <td>@item.LastName</td>
+                <td>@item.School</td>
+                <td><a class="btn btn-success btn-sm" @onclick="@(() => ShowEditPage(item.StudentId, item.FirstName))">edit</a></td>
+                <td><a class="btn btn-danger btn-sm" @onclick="@(() => ShowDeletePage(item.StudentId, item.FirstName))">del</a></td>
+            </tr>
+            }
+        </tbody>
+    </table>
+}
+
+
+@code { 
+    private enum MODE { None, Add, Edit, Delete };
+
+    MODE mode = MODE.None; // default is None
+    Student s;
+
+    Student[] students;
+
+    string baseUrl = "http://localhost:9709/"; // URL of our API service :9709.
+
+    protected override async Task OnInitializedAsync() // fires on page load
+    {
+        await load();
+    }
+
+    protected async Task load()
+    {
+        students = await httpClient.GetFromJsonAsync<Student[]>($"{baseUrl}api/students");
+    }
+
+    protected void ShowAddPage()
+    {
+        NavManager.NavigateTo("/addpage");
+    }
+    protected void ShowEditPage(string id, string name)
+    {
+        NavManager.NavigateTo("/editpage/" + id+"/"+name);
+    }
+
+    protected void ShowDeletePage(string id, string name)
+    {
+
+        NavManager.NavigateTo("/deletepage/" + id +"/"+ name);
+    }
+}

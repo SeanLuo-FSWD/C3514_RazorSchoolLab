@@ -1,0 +1,48 @@
+@page "/editpage/{userId}/{name}"
+@inject HttpClient httpClient
+@inject NavigationManager NavManager
+
+<h1>Edit user @Name</h1>
+
+<EditForm Model="@student" OnValidSubmit="@HandleUpdate">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <InputText placeholder="First Name" id="firstName" @bind-Value="@student.FirstName" />
+    <br />
+    <InputText placeholder="Last Name" id="lastName" @bind-Value="@student.LastName" />
+    <br />
+    <InputText placeholder="School" id="school" @bind-Value="@student.School" />
+    <br />
+    <button type="submit" class="btn btn-success">Submit</button>
+
+    @code { private async void HandleUpdate()
+        {
+            string endpoint = $"{baseUrl}api/students/{student.StudentId}";
+
+            await httpClient.PutAsJsonAsync(endpoint, student);
+            NavManager.NavigateTo("/");
+
+        } }
+</EditForm>
+
+@code {
+    [Parameter]
+    public string UserId { get; set; }
+    [Parameter]
+    public string Name {get; set;}
+    private Student student = new Student();
+    Student s;
+    string baseUrl = "http://localhost:9709/";
+    protected async override void OnInitialized()
+    {
+        Name = Name;
+        UserId = UserId;
+        s = await httpClient.GetFromJsonAsync<Student>($"{baseUrl}api/students/{UserId}");
+        student.StudentId = s.StudentId;
+        student.FirstName = s.FirstName;
+        student.LastName = s.LastName;
+        student.School = s.School;
+        StateHasChanged();
+    }
+}
